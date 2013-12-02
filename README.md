@@ -1,2 +1,2 @@
-FEM2D_Beam
-==========
+FEM2D_Visualize
+===============
