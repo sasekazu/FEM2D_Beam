@@ -54,7 +54,8 @@ $(document).ready(function() {
 	// アニメーションループ
 	function animate(){
 		fem.setBoudary(mousePos);
-		fem.calcDeformation();
+		//fem.calcDeformation();
+		fem.calcDynamicDeformation(0.01);
 		drawScene();
 		setTimeout(animate, 20);
 	}
@@ -72,6 +73,7 @@ $(document).ready(function() {
 		context.setTransform(1, 0, 0, -1, xzero, yzero);
 		// メッシュ
 		var p1,p2;
+		/*
 		context.strokeStyle = 'rgb(0,0,0)';
 		context.fillStyle = 'rgb(0,0,0)';
 		for(var i=0; i<fem.ele.length; i++) {
@@ -79,14 +81,15 @@ $(document).ready(function() {
 			p2=fem.pos[fem.ele[i][1]];
 			drawLine(p1, p2);
 		}
+		*/
 		context.strokeStyle = 'rgb(0,0,0)';
 		context.fillStyle = 'rgb(0,0,0)';
 		for(var i=0; i<fem.pos.length; i++) {
 			drawCircle(fem.pos[i], 3);
 		}
 
-		context.strokeStyle = 'red';
-		context.fillStyle = 'red';
+		context.strokeStyle = 'black';
+		context.fillStyle = 'black';
 		for(var i=0; i<fem.ele.length; i++) {
 			for(var j=0; j<fem.poscg[i].length-1; j++) {
 				drawLine(fem.poscg[i][j], fem.poscg[i][j+1]);
