@@ -31,7 +31,7 @@ function FEM(){
 	this.beta_th = 0.0;
 
 	this.mass = [];
-	this.gravity = 10;
+	this.gravity = 0;
 }
 
 
@@ -150,14 +150,14 @@ FEM.prototype.setBoudary=function (mousePos) {
 		contactNode = (this.pos.length-1)/2;
 
 	for(var i=0; i<this.pos.length; i++) {
-		//if(i==0 || i==this.pos.length-1){
-		if(i==0){
+		if(i==0 || i==this.pos.length-1){
+//		if(i==0 || i==this.pos.length-1){
 			this.u[3*i+0] = 0;
 			this.u[3*i+1] = 0;
 			this.bcFlag[3*i+0]=1;
 			this.bcFlag[3*i+1]=1;
 			this.bcFlag[3*i+2]=0;
-		} else if(i==this.pos.length-1) {
+		} else if(i==contactNode) {
 			this.u[3*i+0] = mousePos[0] - this.initpos[i][0];
 			this.u[3*i+1] = mousePos[1];
 			this.bcFlag[3*i+0]=1;

@@ -48,7 +48,7 @@ $(document).ready(function() {
 	
 	// FEMインスタンス作成
 	var fem = new FEM();
-	fem.lineMesh(-200, 200, 30, 10);
+	fem.lineMesh(-200, 200, 10, 10);
 	animate();
 	
 	// アニメーションループ
@@ -56,7 +56,7 @@ $(document).ready(function() {
 		fem.setBoudary(mousePos);
 		//fem.calcDeformation();
 		fem.calcDynamicDeformation(0.3);
-		fem.modifyPosCld(-xzero, -canvasHeight+yzero, xzero, yzero);
+		//fem.modifyPosCld(-xzero, -canvasHeight+yzero, xzero, yzero);
 		drawScene();
 		setTimeout(animate, 20);
 	}
@@ -86,11 +86,11 @@ $(document).ready(function() {
 		// FEM節点の描画
 		for(var i=0; i<fem.pos.length; i++) {
 			if(fem.bcFlag[3*i]==1) {
-				context.strokeStyle='red';
-				context.fillStyle='red';
-			} else {
 				context.strokeStyle='black';
 				context.fillStyle='black';
+			} else {
+				context.strokeStyle='black';
+				context.fillStyle='white';
 			}
 			drawCircle(fem.pos[i], 3);
 		}
