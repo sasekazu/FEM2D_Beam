@@ -48,14 +48,15 @@ $(document).ready(function() {
 	
 	// FEMインスタンス作成
 	var fem = new FEM();
-	fem.lineMesh(-200, 200, 40, 3);
+	fem.lineMesh(-200, 200, 30, 10);
 	animate();
 	
 	// アニメーションループ
 	function animate(){
 		fem.setBoudary(mousePos);
 		//fem.calcDeformation();
-		fem.calcDynamicDeformation(0.1);
+		fem.calcDynamicDeformation(0.3);
+		fem.modifyPosCld(-xzero, -canvasHeight+yzero, xzero, yzero);
 		drawScene();
 		setTimeout(animate, 20);
 	}
@@ -82,12 +83,29 @@ $(document).ready(function() {
 			drawLine(p1, p2);
 		}
 		*/
-		context.strokeStyle = 'rgb(0,0,0)';
-		context.fillStyle = 'rgb(0,0,0)';
+		// FEM節点の描画
 		for(var i=0; i<fem.pos.length; i++) {
+			if(fem.bcFlag[3*i]==1) {
+				context.strokeStyle='red';
+				context.fillStyle='red';
+			} else {
+				context.strokeStyle='black';
+				context.fillStyle='black';
+			}
 			drawCircle(fem.pos[i], 3);
 		}
 
+		// FEM節点番号の描画
+		/*
+		context.setTransform(1,0,0,1,0,0);
+		context.font = "20pt Arial";
+		for(var i=0; i<fem.pos.length; i++){
+			context.fillText(i, fem.pos[i][0]+xzero, -fem.pos[i][1]+yzero); 		
+		}
+		context.setTransform(1,0,0,-1,xzero,yzero);
+		*/
+
+		// FEM形状の描画
 		context.strokeStyle = 'black';
 		context.fillStyle = 'black';
 		for(var i=0; i<fem.ele.length; i++) {
