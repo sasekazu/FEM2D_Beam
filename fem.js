@@ -4,30 +4,30 @@
 
 
 function FEM(){
-	this.pos = [];
-	this.initpos = [];
-	this.th = [];
-	this.ele = [];
-	this.vel = [];		// 2n x 1
-	this.initposcg = [];
-	this.poscg=[];
+	this.pos = [];		// 節点現在位置 n x 2
+	this.initpos = [];	// 節点初期位置 n x 2
+	this.th = [];		// 節点たわみ角 n x 1
+	this.ele = [];		// 要素の節点リスト e x 2
+	this.vel = [];		// 速度ベクトル 2n x 1
+	this.initposcg = [];	// 描画用頂点初期位置 e x (divcg+1) x 2
+	this.poscg=[];			// 描画用頂点現在位置 e x (divcg+1) x 2
 
-	this.K = [];
-	this.bcFlag = [];	// 境界条件　0:外力既知 1:変位既知
-	this.u = [];
-	this.f = [];
-	this.ud = [];
-	this.uf = [];
-	this.udprev = [];
-	this.ff=[];
+	this.K = [];		// 全体剛性マトリクス 2n x 2n
+	this.bcFlag = [];	// 境界条件フラグ　0:外力既知 1:変位既知 2n x 1
+	this.u = [];		// 全体変位ベクトル 2n x 1
+	this.f = [];		// 全体外力ベクトル 2n x 1
+	this.ud = [];		// 変位既知部分の変位ベクトル d x 1
+	this.uf = [];		// 外力既知部分の変位ベクトル f x 1
+	this.udprev = [];	// 前ループのuに対応するud d x 1
+	this.ff=[];			// 外力既知部分の外力ベクトル f x 1
 
-	this.density = 0.000001;
+	this.density = 0.01;	
 	this.area = 0.01;
 
-	this.alpha = 0.01;
+	this.alpha = 1000;
 	this.beta = 0.0;
 
-	this.alpha_th =100000;
+	this.alpha_th =10000;
 	this.beta_th = 0.0;
 
 	this.mass = [];
@@ -134,14 +134,14 @@ FEM.prototype.setBoudary=function (mousePos) {
 			this.udprev.push(uprev[2*i]);
 			this.ff.push(0);
 			this.uf.push(uprev[2*i+1]);
-		} else if(i==5) {
+		} else if(i==10) {
 			this.u[2*i] = mousePos[1];
 			this.bcFlag.push(1);
-			this.bcFlag.push(0);
+			this.bcFlag.push(1);
 			this.ud.push(this.u[2*i]);
 			this.udprev.push(uprev[2*i]);
-			this.ff.push(0);
-			this.uf.push(uprev[2*i+1]);
+			this.ud.push(this.u[2*i+1]);
+			this.udprev.push(uprev[2*i+1]);
 		} else if(i==this.pos.length-1) {
 			this.u[2*i] = 0;
 			this.bcFlag.push(1);

@@ -48,14 +48,14 @@ $(document).ready(function() {
 	
 	// FEMインスタンス作成
 	var fem = new FEM();
-	fem.lineMesh(-200, 200, 8, 60);
+	fem.lineMesh(-200, 200, 40, 3);
 	animate();
 	
 	// アニメーションループ
 	function animate(){
 		fem.setBoudary(mousePos);
 		//fem.calcDeformation();
-		fem.calcDynamicDeformation(0.01);
+		fem.calcDynamicDeformation(0.1);
 		drawScene();
 		setTimeout(animate, 20);
 	}
