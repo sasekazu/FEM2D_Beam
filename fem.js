@@ -21,12 +21,15 @@ function FEM(){
 	this.udprev = [];
 	this.ff=[];
 
-	this.density = 0.001;
-	this.area = 1;
-	this.alpha = 0.0;
-	this.beta = 0.01;
-	this.alpha_th = 100000;
-	this.beta_th = 0.001;
+	this.density = 0.000001;
+	this.area = 0.01;
+
+	this.alpha = 0.01;
+	this.beta = 0.0;
+
+	this.alpha_th =100000;
+	this.beta_th = 0.0;
+
 	this.mass = [];
 }
 
@@ -243,7 +246,10 @@ FEM.prototype.calcDynamicDeformation=function (dt) {
 
 	var M = numeric.identity(f);
 	for(var i=0; i<f; i++) {
-		M[i][i] *= (1+this.alpha*dt)*this.mass[flist[i]];
+		if(flist[i]%2==0)
+			M[i][i] *= (1+this.alpha*dt)*this.mass[flist[i]];
+		else
+			M[i][i]*=(1+this.alpha_th*dt)*this.mass[flist[i]];
 	}
 
 	var Mright1=numeric.dot(M, vf);
