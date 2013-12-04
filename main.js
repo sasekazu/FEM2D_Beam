@@ -53,12 +53,14 @@ $(document).ready(function() {
 	
 	// アニメーションループ
 	function animate(){
-		fem.setBoudary(mousePos);
+		fem.setBoundary(mousePos);
 		//fem.calcDeformation();
-		fem.calcDynamicDeformation(0.3);
+		//fem.calcDeformationSW();
+		fem.calcDynamicDeformation(0.1);
 		//fem.modifyPosCld(-xzero, -canvasHeight+yzero, xzero, yzero);
 		drawScene();
-		setTimeout(animate, 20);
+		
+		setTimeout(animate,10);
 	}
 	
 	///////////////////////////////////////////////
@@ -75,24 +77,36 @@ $(document).ready(function() {
 		// メッシュ
 		var p1,p2;
 		/*
-		context.strokeStyle = 'rgb(0,0,0)';
-		context.fillStyle = 'rgb(0,0,0)';
+		context.strokeStyle = 'black';
+		context.fillStyle = 'black';
 		for(var i=0; i<fem.ele.length; i++) {
 			p1=fem.pos[fem.ele[i][0]];
 			p2=fem.pos[fem.ele[i][1]];
 			drawLine(p1, p2);
 		}
 		*/
+
+		// FEM形状の描画
+		context.lineWidth = 10;
+		context.strokeStyle = 'black';
+		context.fillStyle = 'black';
+		for(var i=0; i<fem.ele.length; i++) {
+			for(var j=0; j<fem.poscg[i].length-1; j++) {
+				drawLine(fem.poscg[i][j], fem.poscg[i][j+1]);
+			}
+		}
+		context.lineWidth = 1;
+
 		// FEM節点の描画
 		for(var i=0; i<fem.pos.length; i++) {
 			if(fem.bcFlag[3*i]==1) {
-				context.strokeStyle='black';
-				context.fillStyle='black';
+				context.strokeStyle='white';
+				context.fillStyle='gray';
 			} else {
 				context.strokeStyle='black';
 				context.fillStyle='white';
 			}
-			drawCircle(fem.pos[i], 3);
+			drawCircle(fem.pos[i], 6);
 		}
 
 		// FEM節点番号の描画
@@ -105,14 +119,7 @@ $(document).ready(function() {
 		context.setTransform(1,0,0,-1,xzero,yzero);
 		*/
 
-		// FEM形状の描画
-		context.strokeStyle = 'black';
-		context.fillStyle = 'black';
-		for(var i=0; i<fem.ele.length; i++) {
-			for(var j=0; j<fem.poscg[i].length-1; j++) {
-				drawLine(fem.poscg[i][j], fem.poscg[i][j+1]);
-			}
-		}
+		
 	}
 	
 	// 線の描画
