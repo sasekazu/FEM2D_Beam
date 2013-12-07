@@ -48,7 +48,7 @@ $(document).ready(function() {
 	
 	// FEMインスタンス作成
 	var fem = new FEM();
-	fem.lineMesh(-200, 200, 10, 10);
+	fem.lineMesh(-200, 200, 20, 10);
 	animate();
 	
 	// アニメーションループ
@@ -56,7 +56,8 @@ $(document).ready(function() {
 		fem.setBoundary(mousePos);
 		//fem.calcDeformation();
 		//fem.calcDeformationSW();
-		fem.calcDynamicDeformation(0.1);
+		//fem.calcDynamicDeformation(0.1);
+		fem.calcDynamicDeformationSW(0.1);
 		//fem.modifyPosCld(-xzero, -canvasHeight+yzero, xzero, yzero);
 		drawScene();
 		
@@ -76,7 +77,7 @@ $(document).ready(function() {
 		context.setTransform(1, 0, 0, -1, xzero, yzero);
 		// メッシュ
 		var p1,p2;
-		/*
+		
 		context.strokeStyle = 'black';
 		context.fillStyle = 'black';
 		for(var i=0; i<fem.ele.length; i++) {
@@ -84,9 +85,10 @@ $(document).ready(function() {
 			p2=fem.pos[fem.ele[i][1]];
 			drawLine(p1, p2);
 		}
-		*/
+		
 
 		// FEM形状の描画
+		/*
 		context.lineWidth = 10;
 		context.strokeStyle = 'black';
 		context.fillStyle = 'black';
@@ -96,6 +98,7 @@ $(document).ready(function() {
 			}
 		}
 		context.lineWidth = 1;
+		*/
 
 		// FEM節点の描画
 		for(var i=0; i<fem.pos.length; i++) {

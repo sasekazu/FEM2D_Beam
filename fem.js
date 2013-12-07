@@ -132,6 +132,8 @@ FEM.prototype.makeMatrixKe=function (young, momInArea) {
 		KeP[1][1] = 1;
 		KeP = numeric.mul(KeP, this.area*E/len);
 
+
+		
 		KeBend[0][0] = 12;
 		KeBend[0][1] = 6*len;
 		KeBend[0][2] = -12;
@@ -145,16 +147,20 @@ FEM.prototype.makeMatrixKe=function (young, momInArea) {
 		KeBend[1][0] = KeBend[0][1]; KeBend[2][0] = KeBend[0][2]; KeBend[2][1] = KeBend[1][2];
 		KeBend[3][0] = KeBend[0][3]; KeBend[3][1] = KeBend[1][3]; KeBend[3][2] = KeBend[2][3];
 		KeBend = numeric.mul(E*I/(len*len*len), KeBend);
+		
 
 		for(var j=0; j<2; j++)
 			for(var k=0; k<2; k++)
 				Ke[3*j][3*k] = KeP[j][k];
 
+		
 		for(var j=0; j<2; j++)
 			for(var k=0; k<2; k++)
 				for(var l=0; l<2; l++)
 					for(var m=0; m<2; m++)
 						Ke[3*j+1+l][3*k+1+m] = KeBend[2*j+l][2*k+m];
+						
+						
 
 		this.Ke.push(Ke);
 	}
@@ -228,57 +234,8 @@ FEM.prototype.setBoundary=function (mousePos) {
 }
 
 
-// Stiffness Warping FEMのための剛性マトリクス再計算
-FEM.prototype.makeMatrixKSW=function () {
-	this.K = numeric.rep([3*this.pos.length,3*this.pos.length],0);
-	var BK = numeric.rep([3*this.pos.length,3*this.pos.length],0);
-
-	var x, y, th, AeMini, AeInv, Be, BeInv, KeTmp, BeKe;
-	for(var i=0; i<this.ele.length; i++) {
-		x = this.u[3*this.ele[i][1]]-this.u[3*this.ele[i][0]];
-		y = this.u[3*this.ele[i][1]+1]-this.u[3*this.ele[i][0]+1];
-		th = Math.atan2(y,x);
-		//AeInvMini = [[Math.cos(th), -Math.sin(th), 0],[Math.sin(th), Math.cos(th), 0],[0,0,th]];
-		AeInvMini = [[Math.cos(th), -Math.sin(th), 0],[Math.sin(th), Math.cos(th), 0],[0,0,1]];
-		BeMini = [[Math.cos(th), -Math.sin(th), 0],[Math.sin(th), Math.cos(th), 0],[0,0,1]];
-		AeInv = numeric.rep([6,6],0);
-		for(var j=0; j<2; j++)
-			for(var k=0; k<3; k++)
-				for(var l=0; l<3; l++)
-					AeInv[3*j+k][3*j+l] = AeInvMini[k][l];
-
-		Be = numeric.rep([6,6],0);
-		for(var j=0; j<2; j++)
-			for(var k=0; k<3; k++)
-				for(var l=0; l<3; l++)
-					Be[3*j+k][3*j+l] = BeMini[k][l];
-
-		// 全体剛性マトリクス作成
-		KeTmp = numeric.dot(this.Ke[i],AeInv);
-		KeTmp = numeric.dot(Be, KeTmp);
-		for(var j=0; j<2; j++)
-			for(var k=0; k<2; k++)
-				for(var l=0; l<3; l++)
-					for(var m=0; m<3; m++)
-						this.K[3*this.ele[i][j]+l][3*this.ele[i][k]+m] += KeTmp[3*j+l][3*k+m];
-
-		// 外力オフセット用マトリクスの作成
-		BeKe = numeric.dot(Be, this.Ke[i]);
-		for(var j=0; j<2; j++)
-			for(var k=0; k<2; k++)
-				for(var l=0; l<3; l++)
-					for(var m=0; m<3; m++)
-						BK[3*this.ele[i][j]+l][3*this.ele[i][k]+m] += BeKe[3*j+l][3*k+m];
-	}
-
-	// 外力オフセットの作成
-	this.foffset = numeric.dot(BK, this.x0);
-	this.foffset = numeric.neg(this.foffset);
-	
-}
-
 // Stiffness Warping FEMのための剛性マトリクス再計算（改良版）
-FEM.prototype.makeMatrixKSW2=function () {
+FEM.prototype.makeMatrixKSW=function () {
 	this.K = numeric.rep([3*this.pos.length,3*this.pos.length],0);
 	var RK = numeric.rep([3*this.pos.length,3*this.pos.length],0);
 	var rotTh = numeric.linspace(0,0,3*this.pos.length);
@@ -287,7 +244,8 @@ FEM.prototype.makeMatrixKSW2=function () {
 	for(var i=0; i<this.ele.length; i++) {
 		x = this.u[3*this.ele[i][1]]-this.u[3*this.ele[i][0]];
 		y = this.u[3*this.ele[i][1]+1]-this.u[3*this.ele[i][0]+1];
-		th = Math.atan2(y,x);
+		//th = Math.atan2(y,x);
+		th = 0;
 
 		ReMini = [[Math.cos(th), -Math.sin(th), 0],[Math.sin(th), Math.cos(th), 0],[0,0,1]];
 		Re = numeric.rep([6,6],0);
@@ -375,7 +333,7 @@ FEM.prototype.calcDeformation = function(){
 
 
 FEM.prototype.calcDeformationSW = function () {
-	this.makeMatrixKSW2();
+	this.makeMatrixKSW();
 
 	var flist = [];
 	var dlist = [];
@@ -424,6 +382,13 @@ FEM.prototype.calcDeformationSW = function () {
 	for(var i=0; i<this.pos.length; i++)
 		for(var j=0; j<2; j++)
 			this.pos[i][j]=this.x[3*i+j];
+
+
+	// thの更新
+	for(var i=0; i<this.th.length; i++) {
+		this.th[i]=this.u[3*i+2];
+	}
+
 }
 
 // 境界条件を設定して変形計算を行う
@@ -512,6 +477,113 @@ FEM.prototype.calcDynamicDeformation = function (dt) {
 	// poscgの更新
 	this.updatePosCG();
 }
+
+
+// 境界条件を設定して変形計算を行う
+// 境界条件は y=0 を固定，ノード番号spNodeに強制変位disp[2]を与える
+FEM.prototype.calcDynamicDeformationSW=function (dt) {
+
+	this.makeMatrixKSW();
+
+	var flist=[];
+	var dlist=[];
+	for(var i=0; i<this.pos.length*3; i++) {
+		if(this.bcFlag[i]==0)
+			flist.push(i);
+		else
+			dlist.push(i);
+	}
+
+	var f=flist.length;
+	var d=dlist.length;
+
+	var vf=numeric.linspace(0, 0, f);
+	for(var i=0; i<f; i++) 
+		vf[i]=this.vel[flist[i]];
+
+	var vd=numeric.linspace(0, 0, d);
+	for(var i=0; i<d; i++) 
+		vd[i]=(this.ud[i]-this.udprev[i])/dt;
+
+	var Kff=numeric.rep([f, f], 0);
+	for(var i=0; i<f; i++)
+		for(var j=0; j<f; j++)
+			Kff[i][j]=this.K[flist[i]][flist[j]];
+
+	var Kfd=numeric.rep([f, d], 0);
+	for(var i=0; i<f; i++)
+		for(var j=0; j<d; j++)
+			Kfd[i][j]=this.K[flist[i]][dlist[j]];
+
+
+	var M=numeric.identity(f);
+	for(var i=0; i<f; i++) {
+		if(flist[i]%3!=2)
+			M[i][i]*=(1+this.alpha*dt)*this.mass[flist[i]];
+		else
+			M[i][i]*=(1+this.alpha_th*dt)*this.mass[flist[i]];
+	}
+
+	var xd = numeric.linspace(0, 0, d);
+	for(var i=0; i<d; i++) 
+		xd[i] = this.x0[dlist[i]] + this.ud[i];
+
+	var xf = numeric.linspace(0, 0, f);
+	for(var i=0; i<f; i++)
+		xf[i] = this.x0[flist[i]] + this.uf[i];
+
+	var fof = numeric.linspace(0,0,f);
+	for(var i=0; i<f; i++)
+		fof[i] = this.foffset[flist[i]];
+
+	var Mleft2=numeric.mul(Kff, dt*(this.beta+dt));
+	var Mleft=numeric.add(M, Mleft2);
+
+	var Mright1=numeric.dot(M, vf);
+	var Mright2=numeric.dot(Kff, xf);
+	Mright2=numeric.neg(Mright2);
+	var tmp=numeric.dot(Kfd, xd);
+	Mright2=numeric.sub(Mright2, tmp);
+	Mright2=numeric.sub(Mright2, fof);
+	Mright2=numeric.add(Mright2, this.ff);
+	Mright2=numeric.mul(Mright2, dt);
+	var Mright=numeric.add(Mright1, Mright2);
+
+	vf=numeric.solve(Mleft, Mright);
+
+	for(var i=0; i<f; i++) 
+		this.vel[flist[i]] = vf[i];
+
+	for(var i=0; i<d; i++) 
+		this.vel[dlist[i]] = vd[i];
+
+	var duf = numeric.mul(dt, vf);
+	this.uf = numeric.add(this.uf, duf);
+
+	for(var i=0; i<f; i++)
+		this.u[flist[i]]=this.uf[i];
+
+	for(var i=0; i<d; i++)
+		this.x[dlist[i]] = xd[i];
+
+	for(var i=0; i<f; i++)
+		this.x[flist[i]] = this.x0[flist[i]] + this.uf[i];
+
+	// posの更新
+	for(var i=0; i<this.pos.length; i++)
+		for(var j=0; j<2; j++)
+			this.pos[i][j]=this.x[3*i+j];
+
+
+	// thの更新
+	for(var i=0; i<this.th.length; i++) 
+		this.th[i] = this.x[3*i+2];
+
+	// poscgの更新
+	//this.updatePosCG();
+}
+
+
 
 FEM.prototype.modifyPosCld = function(xmin, ymin, xmax, ymax){
 	for(var i=0; i<this.pos.length; i++) {
